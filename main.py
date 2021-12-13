@@ -10,7 +10,6 @@ import random
         [0,0,0,4,1,9,0,0,5],
         [0,0,0,0,8,0,0,0,0]]"""
 
-copie_tabla = [[0 for i in range(9)] for j in range(9)]
 
 tabla = [[1, 2, 3, 4, 5, 6, 7, 8, 9],
          [4, 5, 6, 7, 8, 9, 1, 2, 3],
@@ -21,6 +20,11 @@ tabla = [[1, 2, 3, 4, 5, 6, 7, 8, 9],
          [5, 3, 1, 6, 4, 2, 9, 7, 8],
          [6, 4, 2, 9, 7, 8, 5, 3, 1],
          [9, 7, 8, 5, 3, 1, 6, 4, 2]]
+
+
+copie_tabla2 = [[tabla[i][j] for j in range(len(tabla[0]))] for i in range(len(tabla))]
+copie_tabla = [[0 for i in range(9)] for j in range(9)]
+
 
 lista_nr = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -35,14 +39,14 @@ def afisare(mat):
 
 def verificare_linii(nr, lin):
     for j in range(9):
-        if tabla[lin][j] == nr:
+        if copie_tabla2[lin][j] == nr:
             return False
     return True
 
 
 def verificare_coloane(nr, col):
     for i in range(9):
-        if tabla[i][col] == nr:
+        if copie_tabla2[i][col] == nr:
             return False
     return True
 
@@ -52,7 +56,7 @@ def verificare_zone(nr, lin, col):
     jj = col // 3 * 3  # ----------------------------------------------. Fiecare patrat are prima coloana numerotata cu 0, 3, sau 6.
     for i in range(3):
         for j in range(3):
-            if tabla[ii + i][jj + j] == nr:  # Parcurgem fiecare patrat. ii reprezinta prima linie din patrat, iar jj prima coloana
+            if copie_tabla2[ii + i][jj + j] == nr:  # Parcurgem fiecare patrat. ii reprezinta prima linie din patrat, iar jj prima coloana
                 return False
     return True
 
@@ -66,21 +70,21 @@ def isValid(nr, lin, col):
 def bkt():
     for i in range(9):
         for j in range(9):
-            if tabla[i][j] == 0:
+            if copie_tabla2[i][j] == 0:
                 for nr in lista_nr:
                     if isValid(nr, i, j):
-                        tabla[i][j] = nr
+                        copie_tabla2[i][j] = nr
                         bkt()
-                        tabla[i][j] = 0  # In caz ca nu am gasit o solutie la problema noastra, ne intoarcem la pasul/pasii anteriori si resetam schimbarea/schimbarile facuta/facute.
+                        copie_tabla2[i][j] = 0  # In caz ca nu am gasit o solutie la problema noastra, ne intoarcem la pasul/pasii anteriori si resetam schimbarea/schimbarile facuta/facute.
                 return "Gata"
     for i in range(9):
         for j in range(9):
-            copie_tabla[i][j] = tabla[i][j]
-    afisare(tabla)
+            copie_tabla[i][j] = copie_tabla2[i][j]
+    afisare(copie_tabla2)
     print()
 
 
-def shift_row(nr):
+def shift_row(nr, board):
     while nr > 0:
         a = random.randint(0, 8)
         a = a // 3 * 3
@@ -88,12 +92,12 @@ def shift_row(nr):
         x = a + b
         j = 0
         while j < 9:
-            tabla[a][j], tabla[x][j] = tabla[x][j], tabla[a][j]
+            board[a][j], board[x][j] = board[x][j], board[a][j]
             j += 1
         nr -= 1
 
 
-def shift_col(nr):
+def shift_col(nr, board):
     while nr > 0:
         a = random.randint(0, 8)
         a = a // 3 * 3
@@ -101,28 +105,34 @@ def shift_col(nr):
         x = a + b
         i = 0
         while i < 9:
-            tabla[i][a], tabla[i][x] = tabla[i][x], tabla[i][a]
+            board[i][a], board[i][x] = board[i][x], board[i][a]
             i += 1
         nr -= 1
 
 
 def genereaza_tabla():
-    shift_col(10)
-    shift_row(10)
+    global copie_tabla2
+    copie_tabla2 = [[tabla[i][j] for j in range(len(tabla[0]))] for i in range(len(tabla))]
+    # Folosind tabla in loc de copie_tabla2 in aceasta functie imi punea k zerouri in tabla originala, ceea ce nu e corect in caz ca vrem sa apelam functia de mai multe ori
+    shift_col(10, copie_tabla2)
+    shift_row(10, copie_tabla2)
     print()
-    k = 2
+    k = 1
     while k > 0:
         i = random.randint(0, 8)
         j = random.randint(0, 8)
-        while tabla[i][j] == 0:  # Deoarece generam pozitii random, e posibil sa dam din nou peste o pozitie in care am pus deja 0, iar noi vrem ca variabila k sa arate cate pozitii vor avea 0.
+        while copie_tabla2[i][j] == 0:  # Deoarece generam pozitii random, e posibil sa dam din nou peste o pozitie in care am pus deja 0, iar noi vrem ca variabila k sa arate cate pozitii vor avea 0.
             i = random.randint(0, 8)
             j = random.randint(0, 8)
-        tabla[i][j] = 0
+        copie_tabla2[i][j] = 0
         k -= 1
-    afisare(tabla)
+    afisare(copie_tabla2)
     print()
+    return copie_tabla2
 
+#copie_tabla2 = genereaza_tabla()
 
+# genereaza_tabla()
 # genereaza_tabla()
 # print("Solutia/Solutiile:")
 # print(bkt())
